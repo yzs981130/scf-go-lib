@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"reflect"
+	"strings"
 )
 
 type Handler interface {
@@ -30,8 +31,11 @@ func (handler functionHandler) Invoke(ctx context.Context, payload []byte) ([]by
 	if err != nil {
 		return nil, err
 	}
-
-	return buf.Bytes(), nil
+	ret := buf.String()
+	ret = strings.Replace(ret, "\\", "", -1)
+	pos1 := strings.Index(ret, "\"")
+	pos2 := strings.LastIndex(ret, "\"")
+	return []byte(ret[pos1 + 1:pos2]), nil
 }
 
 func errorHandler(e error) functionHandler {

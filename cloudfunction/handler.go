@@ -1,6 +1,7 @@
 package cloudfunction
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -22,12 +23,15 @@ func (handler functionHandler) Invoke(ctx context.Context, payload []byte) ([]by
 		return nil, err
 	}
 
-	responseBytes, err := json.Marshal(response)
+	var buf bytes.Buffer
+	enc := json.NewEncoder(&buf)
+	enc.SetEscapeHTML(false)
+	err = enc.Encode(response)
 	if err != nil {
 		return nil, err
 	}
 
-	return responseBytes, nil
+	return buf.Bytes(), nil
 }
 
 func errorHandler(e error) functionHandler {
